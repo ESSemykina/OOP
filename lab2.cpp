@@ -25,14 +25,13 @@ public:
         denom = d;
     }
 
-    // вывод в консоль
+
     void print() {
         if (whole != 0)
             cout << whole << "+";
         cout << numer << '/' << denom << endl;
     }
 
-    // ввод с консоли
     bool read() {
         string str;
         getline(cin, str);
@@ -57,7 +56,7 @@ public:
         this->set(a, b);
         return true;
     }
-    //сокращение дроби
+
     void reduction()
     {
         int gcd_value = gcd(numer, denom);
@@ -65,14 +64,14 @@ public:
         denom /= gcd_value;
     }
 
-    // перевод в десятичную дробь
+
     float toDecimal() {
         cout << "Перевод в десятичную дробь ";
         float tmp = float(numer) / float(denom);
         return tmp;
     }
 
-    // выделение целой части
+ 
     Ratio wholePart() {
         cout << "Выделение целой части ";
         Ratio tmp;
@@ -92,7 +91,7 @@ public:
         return tmp;
     }
 
-    //перегрузка операторов и методы, ссылающиеся на перегрузку
+   
     void operator=(const Ratio& r) {
         numer = r.getNumer();
         denom = r.getDenom();
