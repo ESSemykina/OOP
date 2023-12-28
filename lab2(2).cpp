@@ -1,182 +1,153 @@
 #include <iostream>
 #include <string>
 
-class Ratio
-{
-public:
-	Ratio(int numer, int denom) : _numer(numer), _denom(denom)
-	{
-		std::cout << "constructor\n";
-	}
+using namespace std;
 
-	Ratio() = default;
-	Ratio(const Ratio& ratio) = default;
-	~Ratio() = default;
-
-	Ratio(const std::string& ratio)
-	{
-		RatioToInt(ratio);
-	}
-
-	int getNumer() const { return _numer; }
-	int getDumer() const { return _denom; }
-
-	void reduction()
-	{
-		int gcd_value = gcd(_numer, _denom);
-		_numer /= gcd_value;
-		_denom /= gcd_value;
-	}
-
-	void reverse()
-	{
-		std::swap(_numer, _denom);
-	}
-
-	double decimal()
-	{
-		double x = _numer * 1.0 / _denom;
-		return x;
-	}
-
-	friend std::istream& operator>>(std::istream& in, Ratio& ratio);
-	friend std::ostream& operator<<(std::ostream& out, const Ratio& ratio);
-
-	Ratio& operator=(const Ratio& ratio) = default;
-
-	Ratio operator+(const Ratio& ratio)
-	{
-		Ratio tmp = *this;
-		tmp._numer = _numer * ratio._denom + _denom * ratio._numer;
-		tmp._denom = _denom * ratio._denom;
-		tmp.reduction();
-		return tmp;
-	}
-
-	Ratio operator-(const Ratio& ratio)
-	{
-		Ratio tmp = *this;
-		tmp._numer = _numer * ratio._denom - _denom * ratio._numer;
-		tmp._denom = _denom * ratio._denom;
-		tmp.reduction();
-		return tmp;
-	}
-
-	Ratio operator/(const Ratio& ratio)
-	{
-		Ratio tmp = *this;
-		tmp._numer = _numer * ratio._denom;
-		tmp._denom = _denom * ratio._numer;
-		tmp.reduction();
-		return tmp;
-	}
-
-	Ratio operator*(const Ratio& ratio)
-	{
-		Ratio tmp = *this;
-		tmp._numer = _numer * ratio._numer;
-		tmp._denom = _denom * ratio._denom;
-		tmp.reduction();
-		return tmp;
-	}
-
+class Fraction {
 private:
-	int _numer;
-	int _denom;
+    int numerator; // числитель
+    int denominator; // знаменатель
 
-	void RatioToInt(const std::string& value) 
-	{
-		int pos = value.find('/');
-		std::string numerStr = value.substr(0, pos);
-		std::string dumerStr = value.substr(pos + 1, value.length() - pos);
+public:
+    Fraction(int n, int d) : numerator(n), denominator(d) {
+        if (d == 0)
+            throw "Division by zero!";
+    }
 
-		_numer = std::stoi(numerStr);
-		_denom = std::stoi(dumerStr);
-	}
+    static int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
 
-	int gcd(int a, int b)
-	{
-		if (b == 0) return a;
-		return gcd(b, a % b);
-	}
+
+    int getNumerator() const { return numerator; }
+    int getDenominator() const { return denominator; }
+
+    Fraction operator+(const Fraction& other) const {
+        int newNumerator = numerator * other.denominator + other.numerator * denominator;
+        int newDenominator = denominator * other.denominator;
+        int c = gcd(newNumerator, newDenominator);
+        newNumerator = newNumerator / c;
+        newDenominator = newDenominator / c;
+
+        return Fraction(newNumerator, newDenominator);
+    }
+
+    Fraction operator-(const Fraction& other) const {
+        int newNumerator = numerator * other.denominator - other.numerator * denominator;
+        int newDenominator = denominator * other.denominator;
+        int c = gcd(newNumerator, newDenominator);
+        newNumerator = newNumerator / c;
+        newDenominator = newDenominator / c;
+
+        return Fraction(newNumerator, newDenominator);
+    }
+
+    Fraction operator*(const Fraction& other) const {
+        int newNumerator = numerator * other.numerator;
+        int newDenominator = denominator * other.denominator;
+        int c = gcd(newNumerator, newDenominator);
+        newNumerator = newNumerator / c;
+        newDenominator = newDenominator / c;
+        return Fraction(newNumerator, newDenominator);
+    }
+
+    Fraction operator/(const Fraction& other) const {
+        int newNumerator = numerator * other.denominator;
+        int newDenominator = denominator * other.numerator;
+        int c = gcd(newNumerator, newDenominator);
+        newNumerator = newNumerator / c;
+        newDenominator = newDenominator / c;
+        return Fraction(newNumerator, newDenominator);
+    }
+
+
+
+    double toDecimal() const {
+        return static_cast<double>(numerator) / static_cast<double>(denominator);
+    }
+
+    Fraction inverse() const {
+        return Fraction(denominator, numerator);
+    }
 };
-
-std::istream& operator>>(std::istream& in, Ratio& ratio)
-{
-	std::string value;
-	in >> value;
-	ratio.RatioToInt(value);
-	return in;
-}
-
-std::ostream& operator<<(std::ostream& out, const Ratio& ratio)
-{
-	out << ratio._numer << "/" << ratio._denom;
-	return out;
-}
-
-void commandList()
-{
-	std::cout << "press 0 to exit\n";
-	std::cout << "press 1 to sum\n";
-	std::cout << "press 2 to substract\n";
-	std::cout << "press 3 to multiply\n";
-	std::cout << "press 4 to divide\n";
-	std::cout << "press 5 to find a reverse ratio\n";
-	std::cout << "press 6 to find a decimal ratio\n";
-	std::cout << "press 7 to see command list\n";
-}
 
 int main()
 {
-	Ratio r1;
-	Ratio r2;
+    try {
+        setlocale(LC_ALL, "Russian");
+        int a;
+        int b;
+        int c;
+        int d;
+        char operation;
+        std::string reply1;
+        std::cout << "Введите числитель первой дроби" << std::endl;
+        std::cin >> a;
+        std::cout << "Введите знаменатель первой дроби" << std::endl;
+        std::cin >> b;
+        std::cout << "Вам нужна вторая дробь? Введите 'Yes' или 'No'" << std::endl;
+        std::cin >> reply1;
+        if (reply1 == "Yes")
+        {
+            std::cout << "Введите числитель второй дроби" << std::endl;
+            std::cin >> c;
+            std::cout << "Введите знаменатель второй дроби" << std::endl;
+            std::cin >> d;
+            cout << "Введите операцию (+, -, *, /) " << std::endl;
+            cin >> operation;
+            Fraction r1(a, b);
+            Fraction r2(c, d);
+            Fraction f3(c, d);
+            switch (operation) {
+            case '+':
+                f3 = r1 + r2;
+                std::cout << "Результат: " << f3.getNumerator() << "/" << f3.getDenominator() << std::endl;
+                break;
+            case '-':
+                f3 = r1 - r2;
+                std::cout << "Результат: " << f3.getNumerator() << "/" << f3.getDenominator() << std::endl;
+                break;
+            case '*':
+                f3 = r1 * r2;
+                std::cout << "Результат: " << f3.getNumerator() << "/" << f3.getDenominator() << std::endl;
+                break;
+            case '/':
+                f3 = r1 / r2;
+                std::cout << "Результат: " << f3.getNumerator() << "/" << f3.getDenominator() << std::endl;
+                break;
+            default:
+                cout << "Неверная операция." << endl;
+            }
+        }
+        else
+        {
+            cout << "Введите операцию (#,%): " << std::endl;
+            cin >> operation;
+            Fraction r1(a, b);
+            double f3;
+            switch (operation) {
+            case '#':
+                f3 = r1.toDecimal();
+                std::cout << "Результат: " << f3 << std::endl;
+                break;
 
-	int command = 1;
+            case '%':
+                r1 = r1.inverse();
+                std::cout << "Результат: " << r1.getNumerator() << "/" << r1.getDenominator() << std::endl;
+                break;
+            default:
+                cout << "Неверная операция." << endl;
+            }
+        }
+    }
 
-	std::cout << "Enter 2 simple ratio separated by space" << std::endl;
-	std::cin >> r1 >> r2;
-	commandList();
-
-
-	while (command != 0)
-	{
-		std::cout << "Command: ";
-		std::cin >> command;
-
-		switch (command)
-		{
-		case 1: std::cout << r1 + r2 << std::endl;
-			break;
-
-		case 2: std::cout << r1 - r2 << std::endl;
-			break;
-
-		case 3: std::cout << r1 * r2 << std::endl;
-			break;
-
-		case 4: std::cout << r1 / r2 << std::endl;
-			break;
-
-		case 5:
-			r1.reverse();
-			r2.reverse();
-			std::cout << r1 << " " << r2 << std::endl;
-			break;
-
-		case 6:
-			std::cout << r1.decimal() << " " << r2.decimal() << std::endl;
-			break;
-
-		case 7:
-			commandList();
-			break;
-
-		default:
-			std::cout << " " << std::endl;
-			break;
-		}
-	};
-
-	return 0;
+    catch (const char* error_message)
+    {
+        std::cout << error_message << std::endl;
+    }
+    std::cout << "The End..." << std::endl;
 }
+
